@@ -22,8 +22,6 @@ else
   fi
 fi
 
-# @FIXME check if the branch is not called 'dirlog' don't do it
-
 ls -l > $logfile
 git add $logfile
 git commit -m 'AUTO: made by `dirlog`'
