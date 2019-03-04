@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+
+logfile='__dir__.log'
+git_branch='dirlog'
+
+if [ ! -d ./.git  ]; then
+  git init
+  git commit --allow-empty -m "init"
+  touch .gitignore
+  echo '*' >> .gitignore
+  echo '!'$logfile >> .gitignore
+  echo '!.git*' >> .gitignore
+  git add .gitignore
+  git commit -m "Ignores all the files in the directory except for the dir.log"
+  git branch -M $git_branch
+
+else
+  current_git_branch=$(git branch | grep \* | cut -d ' ' -f2)
+  if [ $current_git_branch != $git_branch ]; then
+    echo '[INFO] Skipped. Already a git repository.'
+    exit
+  fi
+fi
+
+# @FIXME check if the branch is not called 'dirlog' don't do it
+
+ls -l > $logfile
+git add $logfile
+git commit -m 'AUTO: made by `dirlog`'
+
