@@ -1,9 +1,20 @@
 #!/usr/bin/env sh
 
-logfile='__dir__.log'
-git_branch='dirlog'
+main() {
+  logfile='__dir__.log'
+  git_branch='dirlog'
 
-if [ ! -d ./.git  ]; then
+  if [ ! -d ./.git  ]; then
+    _create_repo
+  elif [ $(_another_repo_exists) ]; then
+      echo '[INFO] Skipped. Already a git repository.'
+      exit
+  else
+    _update_repo
+  fi
+}
+
+_create_repo() {
   git init
   git commit --allow-empty -m "init"
   touch .gitignore
@@ -13,16 +24,17 @@ if [ ! -d ./.git  ]; then
   git add .gitignore
   git commit -m "Ignores all the files in the directory except for the dir.log"
   git branch -M $git_branch
+}
 
-else
+_another_repo_exists() {
   current_git_branch=$(git branch | grep \* | cut -d ' ' -f2)
-  if [ $current_git_branch != $git_branch ]; then
-    echo '[INFO] Skipped. Already a git repository.'
-    exit
-  fi
-fi
+  [ $current_git_branch != $git_branch ] && echo 1
+}
 
-ls -l > $logfile
-git add $logfile
-git commit -m 'AUTO: made by `dirlog`'
+_update_repo() {
+  ls -l > $logfile
+  git add $logfile
+  git commit -m 'AUTO: made by `dirlog`'
+}
 
+main
